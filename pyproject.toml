@@ -1,0 +1,54 @@
+[tool.poetry]
+name = "svitoch"
+version = "0.0.1"
+description = "Application that create learning courses"
+authors = [
+    "Artem Kakun <kakun.artem@gmail.com>",
+]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+langchain = "^0.0.270"
+openai = "^0.27.8"
+python-dotenv = "^1.0.0"
+elasticsearch = "^8.8.0"
+fastapi = "^0.97.0"
+uvicorn = "^0.22.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.3.2"
+uvicorn = "^0.22.0"
+pandas = "^2.0.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+    "C",  # flake8-comprehensions
+    "B",  # flake8-bugbear
+]
+ignore = [
+    "E501",  # line too long, handled by black
+    "B008",  # do not perform function calls in argument defaults
+    "C901",  # too complex
+]
+extend-exclude = ['tests', 'cli.py', '.venv', 'misc']
+
+[tool.mypy]
+strict = true
+exclude = [
+    'cli.py',  # exclude cli.py from checks
+    '.venv',  # exclude .venv from checks
+    'venv',  # exclude venv from checks
+    'misc'  # exclude misc from checks
+]
+
+[tool.black]
+line-length = 80

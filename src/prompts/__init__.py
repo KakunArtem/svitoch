@@ -1,0 +1,1 @@
+from .course_prompts import base_course_prompt, advance_course_prompt
