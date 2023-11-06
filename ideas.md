@@ -1,0 +1,1 @@
+-elastic usage - Predefined text that we  can use for creating a course (keywords in Elastic can identify text) 
