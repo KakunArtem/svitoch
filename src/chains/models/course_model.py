@@ -1,8 +1,3 @@
-import os
-from langchain.prompts import ChatPromptTemplate, HumanMessagePromptTemplate
-from langchain.chat_models import ChatOpenAI
-
-from langchain.output_parsers import PydanticOutputParser
 from pydantic import BaseModel, Field
 from typing import List
 

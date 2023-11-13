@@ -3,6 +3,8 @@ Coding:
 - async request support
 
 Business:
+- add separate endpoint for topics
 - data base integration to store courses
-- admin panel to work with prompts
 - multi-language support
+- admin panel to work with prompts
+- analyse courses
