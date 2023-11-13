@@ -18,7 +18,8 @@ class Config(BaseSettings):
     LOG_LEVEL: str = "INFO"
     TIMEZONE: tzinfo = timezone("Europe/Kyiv")
 
-    OPENAI_GENERATION_MODEL_NAME: str
+    OPENAI_3_5_GENERATION_MODEL_NAME: str
+    OPENAI_4_GENERATION_MODEL_NAME: str
     OPENAI_API_KEY: str
 
     PROJECT_ROOT: Path = Path(__file__).absolute().parent.parent

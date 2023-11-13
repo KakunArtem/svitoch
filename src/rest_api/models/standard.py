@@ -4,7 +4,7 @@ from pydantic import BaseModel, Field
 
 
 class DefaultResponse(BaseModel):
-    generated: dict
+    response: dict
     debug: Optional[Dict[str, Any]] = None
 
 

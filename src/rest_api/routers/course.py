@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 
-from src.chains.course_chain import CourseChain
+from src.chains import TopicsChain
+from src.chains.course_chain import CourseChain, LlmTypes
 from src.configuration import logger
 from src.rest_api.models import DefaultResponse, ModelRequest
 
@@ -13,14 +14,14 @@ router = APIRouter(
 @router.post(
     "/base_course", response_model=DefaultResponse, response_model_exclude_none=True
 )
-async def generate_response_base_course(request: ModelRequest) -> DefaultResponse:
+def generate_response_base_course(request: ModelRequest) -> DefaultResponse:
     logger.info(f"Received request text: `{request.text}`")
 
     chain = CourseChain()
 
     generated_text = chain(inputs={
         "query": request.text,
-        "course_type": "base_course"
+        "llm_version": LlmTypes.Gpt_3
     })
 
     return DefaultResponse(
@@ -34,13 +35,20 @@ async def generate_response_base_course(request: ModelRequest) -> DefaultRespons
 async def generate_response_base_course(request: ModelRequest) -> DefaultResponse:
     logger.info(f"Received request text: `{request.text}`")
 
-    chain = CourseChain()
+    course_chain = CourseChain()
+    topics_chain = TopicsChain()
 
-    generated_text = chain(inputs={
+    course_chain_response = course_chain(inputs={
         "query": request.text,
-        "course_type": "advance_course"
+        "llm_version": LlmTypes.Gpt_4
     })
 
+    topics_chain_response = topics_chain(inputs=course_chain_response)
+
+    response = {}
+    response.update(course_chain_response)
+    response.update(topics_chain_response)
+
     return DefaultResponse(
-        generated=generated_text
+        response=response
     )

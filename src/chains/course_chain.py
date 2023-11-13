@@ -1,20 +1,24 @@
+import json
 from typing import List, Dict, Any, Optional
 
 from langchain.callbacks.manager import CallbackManagerForChainRun
 from langchain.chains.base import Chain
 
 from src.configuration import logger
-from src.llms import OpenAIChatGeneration
-from src.prompts import base_course_prompt, advance_course_prompt
+from src.llms import OpenAI3Model, OpenAI4Model
+from src.prompts import course_prompt
 
 
-class CourseTypes:
-    BASE_COURSE = 'base_course'
-    ADVANCE_COURSE = 'advance_course'
+class LlmTypes:
+    Gpt_3 = 'gpt_3'
+    Gpt_4 = 'gpt_4'
 
 
 class CourseChain(Chain):
-    llm = OpenAIChatGeneration()
+    llms = {
+        LlmTypes.Gpt_3: OpenAI3Model(),
+        LlmTypes.Gpt_4: OpenAI4Model()
+    }
 
     @property
     def input_keys(self) -> List[str]:
@@ -22,29 +26,27 @@ class CourseChain(Chain):
 
     @property
     def output_keys(self) -> List[str]:
-        return ["response_text"]
+        return ["course_content"]
 
-    def _define_prompt(self, course_type):
-        if course_type == CourseTypes.BASE_COURSE:
-            return base_course_prompt
-        elif course_type == CourseTypes.ADVANCE_COURSE:
-            return advance_course_prompt
+    def _get_llm_version(self, llm_version):
+        llm = self.llms.get(llm_version)
+        if llm is None:
+            raise ValueError(f"Invalid llm_version: {llm_version}")
+        return llm
 
     def _call(
             self,
             inputs: Dict[str, Any],
             run_manager: Optional[CallbackManagerForChainRun] = None,
     ) -> dict:
+        llm_version = self._get_llm_version(inputs.get("llm_version"))
         query = inputs["query"]
-        course_type = inputs["course_type"]
 
-        prompt_value = self._define_prompt(course_type).format_prompt(
-            query=query
-        )
+        prompt_value = course_prompt.format_prompt(query=query)
 
         logger.info(f"Full prompt: `{prompt_value}`")
 
-        response = self.llm.generate_prompt(
+        response = llm_version.generate_prompt(
             [prompt_value],
             callbacks=run_manager.get_child() if run_manager else None,
         )
@@ -52,7 +54,7 @@ class CourseChain(Chain):
         response_text = response.generations[0][0].text
 
         result = {
-            "response_text": response_text
+            "course_content": json.loads(response_text.replace("```json", "").replace("```", ""))
         }
 
         return result

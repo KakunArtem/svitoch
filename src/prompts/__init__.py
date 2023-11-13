@@ -1,1 +1,1 @@
-from .course_prompts import base_course_prompt, advance_course_prompt
+from .course_prompts import course_prompt, topic_template, topic_prompt
