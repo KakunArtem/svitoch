@@ -1,7 +1,7 @@
 from langchain.output_parsers import PydanticOutputParser
 from langchain.prompts import HumanMessagePromptTemplate, ChatPromptTemplate
 
-from src.chains import Course
+from src.chains.models.course_model import Course
 from src.prompts.external_prompt import ExternalChatPromptTemplate
 
 course_model = PydanticOutputParser(pydantic_object=Course)

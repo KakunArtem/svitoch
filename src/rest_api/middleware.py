@@ -1,13 +1,12 @@
 import time
 from typing import Any
 
-
 from fastapi import Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.types import Message
 
-from .app import app
 from src.configuration import logger
+from .app import app
 
 app.add_middleware(
     CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"]

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "svitoch"
-version = "0.0.2"
+version = "0.0.1"
 description = "Application that create learning courses"
 authors = [
     "Artem Kakun <kakun.artem@gmail.com>",
@@ -9,7 +9,7 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.11"
-langchain = "0.0.334"
+langchain = "^0.0.334"
 openai = "^0.27.8"
 python-dotenv = "^1.0.0"
 elasticsearch = "^8.8.0"

@@ -11,4 +11,3 @@ class DefaultResponse(BaseModel):
 class ModelRequest(BaseModel):
     text: str = Field(..., min_length=1)
     debug: Optional[bool] = Field(default=False, alias="_debug", exclude=True)
-
