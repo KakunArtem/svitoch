@@ -19,9 +19,9 @@ class CourseController(metaclass=SingletonMeta):
         self._course_chain = CourseChain()
         self._topics_chain = TopicsChain()
 
-    def process_request(self, request_query, request_uuid, llm_version):
-        course_chain_response = self._get_course_chain_response(request_query, llm_version)
-        topics_chain_response = self._get_topics_chain_response(course_chain_response)
+    def process_request(self, request_query, request_uuid, llm_version, language):
+        course_chain_response = self._get_course_chain_response(request_query, llm_version, language)
+        topics_chain_response = self._get_topics_chain_response(course_chain_response, language)
 
         response = json.dumps({
             **course_chain_response, **topics_chain_response
@@ -29,14 +29,18 @@ class CourseController(metaclass=SingletonMeta):
 
         self._data_controller.store_data(response, DataStorage.COURSE, request_uuid)
 
-    def _get_course_chain_response(self, request_query, llm_version):
+    def _get_course_chain_response(self, request_query, llm_version, language):
         return self._course_chain(inputs={
             "query": request_query,
-            "llm_version": llm_version
+            "llm_version": llm_version,
+            "language": language
         })
 
-    def _get_topics_chain_response(self, course_chain_response):
-        return self._topics_chain(inputs=course_chain_response)
+    def _get_topics_chain_response(self, course_chain_response, language):
+        return self._topics_chain(inputs={
+            **course_chain_response,
+            "language": language
+        })
 
     def get_course_by_uuid(self, request_uuid):
         return self._data_controller.get_data(request_uuid)

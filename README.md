@@ -28,7 +28,8 @@ poetry install --with dev
 
 2. Set .env file with required properties:
 - "OPENAI_API_KEY"
-- "OPENAI_GENERATION_MODEL_NAME"
+- "OPENAI_3_5_GENERATION_MODEL_NAME"
+- "OPENAI_4_GENERATION_MODEL_NAME"
 
 3. Start local server:
 ```bash

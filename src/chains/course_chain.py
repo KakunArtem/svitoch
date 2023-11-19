@@ -22,7 +22,7 @@ class CourseChain(Chain):
 
     @property
     def input_keys(self) -> List[str]:
-        return ["query"]
+        return ["query", "language"]
 
     @property
     def output_keys(self) -> List[str]:
@@ -41,8 +41,9 @@ class CourseChain(Chain):
     ) -> dict:
         llm_version = self._get_llm_version(inputs.get("llm_version"))
         query = inputs["query"]
+        language = inputs["language"]
 
-        prompt_value = course_prompt.format_prompt(query=query)
+        prompt_value = course_prompt.format_prompt(query=query, language=language)
 
         logger.info(f"Full prompt: `{prompt_value}`")
 

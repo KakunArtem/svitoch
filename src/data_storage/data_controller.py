@@ -33,6 +33,9 @@ class DataController:
 
     def get_data(self, uuid):
         file_path = self.find_file(DataStorage.script_dir, uuid)
+        if not file_path:
+            return None
+
         with open(file_path, 'r') as json_file:
             data = json.load(json_file)
 

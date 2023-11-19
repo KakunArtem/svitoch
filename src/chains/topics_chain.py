@@ -14,7 +14,7 @@ class TopicsChain(Chain):
 
     @property
     def input_keys(self) -> List[str]:
-        return ["course_content"]
+        return ["course_content", "language"]
 
     @property
     def output_keys(self) -> List[str]:
@@ -41,7 +41,7 @@ class TopicsChain(Chain):
         topics_dict = self._get_topics_dict(topics)
         prompt_list = self._get_prompts_list(topics)
 
-        response = RunnableParallel(prompt_list).invoke(topics_dict)
+        response = RunnableParallel(prompt_list).invoke({**topics_dict, "language": inputs["language"]})
 
         return {
             "topics_content": {key: value.content for key, value in response.items()}

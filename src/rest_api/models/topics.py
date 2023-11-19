@@ -1,5 +1,5 @@
-from typing import List
-from pydantic import BaseModel
+from typing import List, Optional
+from pydantic import BaseModel, Field
 
 
 class Topic(BaseModel):
@@ -13,3 +13,4 @@ class CourseContent(BaseModel):
 
 class Course(BaseModel):
     course_content: CourseContent
+    language: Optional[str] = Field(min_length=1, alias="language", default="English")

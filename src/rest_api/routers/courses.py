@@ -25,6 +25,7 @@ async def _generate_response(
         "request_uuid": course_uuid,
         "request_query": request.text,
         "llm_version": llm_version,
+        "language": request.language
     }
 
     background_tasks.add_task(process_course_request, inputs)

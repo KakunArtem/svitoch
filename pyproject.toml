@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "svitoch"
-version = "0.0.1"
+version = "0.0.3"
 description = "Application that create learning courses"
 authors = [
     "Artem Kakun <kakun.artem@gmail.com>",
