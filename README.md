@@ -35,3 +35,7 @@ poetry install --with dev
 ```bash
 poetry run uvicorn src.rest_api.app:app --host=0.0.0.0 --port=8080 --reload
 ```
+4. Swagger UI URL
+```bash
+http://localhost:8080/docs
+```
