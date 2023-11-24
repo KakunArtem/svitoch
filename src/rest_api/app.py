@@ -2,11 +2,11 @@ from fastapi import FastAPI, Request, status
 from requests import Timeout
 from starlette.responses import JSONResponse
 
-from src.rest_api.routers import courses, topics
+from src.rest_api.routers import courses, lessons
 
 app = FastAPI()
 app.include_router(courses.router)
-app.include_router(topics.router)
+app.include_router(lessons.router)
 
 
 @app.exception_handler(Timeout)

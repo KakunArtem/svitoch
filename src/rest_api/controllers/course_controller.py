@@ -1,6 +1,6 @@
 import json
 
-from src.chains import CourseChain, TopicsChain
+from src.chains import CourseChain, LessonChain
 from src.data_storage import DataController, DataStorage
 
 
@@ -17,14 +17,14 @@ class CourseController(metaclass=SingletonMeta):
     def __init__(self):
         self._data_controller = DataController()
         self._course_chain = CourseChain()
-        self._topics_chain = TopicsChain()
+        self._lessons_chain = LessonChain()
 
     def process_request(self, request_query, request_uuid, llm_version, language):
         course_chain_response = self._get_course_chain_response(request_query, llm_version, language)
-        topics_chain_response = self._get_topics_chain_response(course_chain_response, language)
+        lessons_chain_response = self._get_lessons_chain_response(course_chain_response, language)
 
         response = json.dumps({
-            **course_chain_response, **topics_chain_response
+            **course_chain_response, **lessons_chain_response
         })
 
         self._data_controller.store_data(response, DataStorage.COURSE, request_uuid)
@@ -36,8 +36,8 @@ class CourseController(metaclass=SingletonMeta):
             "language": language
         })
 
-    def _get_topics_chain_response(self, course_chain_response, language):
-        return self._topics_chain(inputs={
+    def _get_lessons_chain_response(self, course_chain_response, language):
+        return self._lessons_chain(inputs={
             **course_chain_response,
             "language": language
         })

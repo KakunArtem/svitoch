@@ -1,6 +1,6 @@
 import json
 
-from src.chains import TopicsChain
+from src.chains import LessonChain
 from src.data_storage import DataController, DataStorage
 
 
@@ -13,22 +13,22 @@ class SingletonMeta(type):
         return cls._instances[cls]
 
 
-class TopicsController(metaclass=SingletonMeta):
+class LessonsController(metaclass=SingletonMeta):
     def __init__(self):
         self._data_controller = DataController()
-        self._topics_chain = TopicsChain()
+        self._lessons_chain = LessonChain()
 
     def process_request(self, request_query, request_uuid):
-        topics_chain_response = self._get_topics_chain_response(request_query)
+        lessons_chain_response = self._get_lessons_chain_response(request_query)
 
         response = json.dumps({
-            **topics_chain_response
+            **lessons_chain_response
         })
 
         self._data_controller.store_data(response, DataStorage.TOPICS, request_uuid)
 
-    def _get_topics_chain_response(self, request_query):
-        return self._topics_chain(inputs=request_query)
+    def _get_lessons_chain_response(self, request_query):
+        return self._lessons_chain(inputs=request_query)
 
-    def get_topics_by_uuid(self, request_uuid):
+    def get_lessons_by_uuid(self, request_uuid):
         return self._data_controller.get_data(request_uuid)

@@ -4,11 +4,11 @@ from fastapi import APIRouter, HTTPException
 from starlette.background import BackgroundTasks
 
 from src.configuration import logger
-from src.rest_api.controllers.topics_controller import TopicsController
+from src.rest_api.controllers.lessons_controller import LessonsController
 from src.rest_api.models import DefaultResponse, Course
 
 router = APIRouter(
-    tags=["Topics"],
+    tags=["Lessons"],
     prefix="/v1",
 )
 
@@ -26,7 +26,7 @@ async def _generate_response(
         "request_query": request.dict()
     }
 
-    background_tasks.add_task(process_topics_request, inputs)
+    background_tasks.add_task(process_lessons_request, inputs)
     return DefaultResponse(
         response={
             "course_uuid": course_uuid
@@ -34,15 +34,15 @@ async def _generate_response(
     )
 
 
-def process_topics_request(inputs):
-    course_controller = TopicsController()
-    course_controller.process_request(**inputs)
+def process_lessons_request(inputs):
+    lessons_controller = LessonsController()
+    lessons_controller.process_request(**inputs)
 
 
 @router.post(
-    "/topics/advance_topics", response_model=DefaultResponse, response_model_exclude_none=True
+    "/lessons/generate_lessons", response_model=DefaultResponse, response_model_exclude_none=True
 )
-async def generate_response_advance_topics(
+async def response_generate_lessons(
         request: Course,
         background_tasks: BackgroundTasks,
 ):
@@ -53,8 +53,8 @@ async def generate_response_advance_topics(
 async def get_course_by_uuid(course_uuid: uuid.UUID):
     logger.info(f"Received request for course UUID: {course_uuid}")
 
-    topics_controller = TopicsController()
-    topics_data = topics_controller.get_topics_by_uuid(course_uuid)
+    topics_controller = LessonsController()
+    topics_data = topics_controller.get_lessons_by_uuid(course_uuid)
 
     if topics_data is None:
         raise HTTPException(status_code=404, detail="Course not found")

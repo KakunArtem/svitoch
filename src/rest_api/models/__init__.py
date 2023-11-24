@@ -1,2 +1,2 @@
 from .standard import DefaultResponse, ModelRequest
-from .topics import Course
+from .lessons import Course

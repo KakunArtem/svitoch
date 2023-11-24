@@ -1,2 +1,2 @@
 from .courses import *
-from .topics import *
+from .lessons import *

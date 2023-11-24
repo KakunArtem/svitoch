@@ -6,10 +6,10 @@ from langchain.prompts import ChatPromptTemplate
 from langchain.schema.runnable import RunnableParallel
 
 from src.llms import OpenAI4Model
-from src.prompts import topic_template
+from src.prompts import lessons_template
 
 
-class TopicsChain(Chain):
+class LessonChain(Chain):
     llm = OpenAI4Model()
 
     @property
@@ -18,18 +18,18 @@ class TopicsChain(Chain):
 
     @property
     def output_keys(self) -> List[str]:
-        return ["topics_content"]
+        return ["lessons_content"]
 
-    def _get_topics(self, topics):
-        return [topic for topic in topics['topics']]
+    def _get_lessons(self, lessons):
+        return [lesson for lesson in lessons.get("lessons")]
 
-    def _get_topics_dict(self, topics):
-        return {f"key{i + 1}": topic for i, topic in enumerate(topics)}
+    def _get_lessons_dict(self, lessons):
+        return {f"key{i + 1}": lesson for i, lesson in enumerate(lessons)}
 
     def _get_prompts_list(self, topics):
         return {
             f"key{i + 1}": ChatPromptTemplate.from_template(
-                topic_template.replace("topics", f"key{i + 1}")
+                lessons_template.replace("lessons", f"key{i + 1}")
             ) | self.llm for i in range(len(topics))
         }
 
@@ -37,12 +37,13 @@ class TopicsChain(Chain):
               inputs: Dict[str, Any],
               run_manager: Optional[CallbackManagerForChainRun] = None,
               ):
-        topics = self._get_topics(inputs["course_content"])
-        topics_dict = self._get_topics_dict(topics)
-        prompt_list = self._get_prompts_list(topics)
+        lessons = self._get_lessons(inputs.get("course_content"))
+        topics_dict = self._get_lessons_dict(lessons)
+        prompt_list = self._get_prompts_list(lessons)
 
-        response = RunnableParallel(prompt_list).invoke({**topics_dict, "language": inputs["language"]})
+        response = RunnableParallel(prompt_list).invoke({**topics_dict, "language": inputs.get("language")})
 
         return {
-            "topics_content": {key: value.content for key, value in response.items()}
+            "course_name": inputs.get("course_content").get("course_name"),
+            "lessons_content": {key: value.content for key, value in response.items()}
         }

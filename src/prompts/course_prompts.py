@@ -32,7 +32,7 @@ course_prompt = ChatPromptTemplate(
     }
 )
 
-topic_template = """
+lessons_template = """
 ### Instructions ###
 If MUST ONLY generate a comprehensive guide for each of the provided topics.
 You MUST provide detailed code examples with explanations.
@@ -42,12 +42,12 @@ You MUST return response as a formatted Markdown text.
 You MUST ALWAYS answer in literature {language} language even if user question in another language.
 ### Instructions ###
 
-Topics: '''{topics}'''
+Lessons: '''{lessons}'''
 """
 
-topic_prompt = ChatPromptTemplate(
+lessons_prompt = ChatPromptTemplate(
     messages=[
-        HumanMessagePromptTemplate.from_template(topic_template)
+        HumanMessagePromptTemplate.from_template(lessons_template)
     ],
-    input_variables=["topics", "language"]
+    input_variables=["lessons", "language"]
 )
