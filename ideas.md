@@ -10,15 +10,4 @@ Business:
 - analyzing job skill sets and building courses based on cluster analysis
 - інтерактивна частина (спілкування з чатом), побудувати навчальне середовище на основі компетенції в рамках спеціалізації
 
-```json
-{
-    "course_name":"string", // required
-    "lessons": [
-        {
-            "title":"string" // required,
-            "topics": [ // optional
-                ""
-            ]
-        }
-    ]
-}
+docker run --name svitoch_postgres -e POSTGRES_PASSWORD=123 -v /Users/artemkakun/Projects/home/svitoch/postgres_data:/var/lib/postgresql/data -p 5432:5432 -d postgres

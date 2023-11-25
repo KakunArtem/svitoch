@@ -1,7 +1,8 @@
 import json
 
 from src.chains import LessonChain
-from src.data_storage import DataController, DataStorage
+from src.configuration import logger
+from src.data_storage import DataController, DataStorage, DbController, GenerationState
 
 
 class SingletonMeta(type):
@@ -17,18 +18,34 @@ class LessonsController(metaclass=SingletonMeta):
     def __init__(self):
         self._data_controller = DataController()
         self._lessons_chain = LessonChain()
+        self._db_controller = DbController()
 
-    def process_request(self, request_query, request_uuid):
-        lessons_chain_response = self._get_lessons_chain_response(request_query)
+    def process_request(self, request_query, course_uuid, llm_version, language):
+        query = request_query.get("course_content").get("course_name")
+        self._db_controller.write_state_data(query, course_uuid, llm_version, language)
 
-        response = json.dumps({
-            **lessons_chain_response
-        })
+        try:
+            self._db_controller.write_course_data(request_query, course_uuid)
 
-        self._data_controller.store_data(response, DataStorage.TOPICS, request_uuid)
+            lessons_chain_response = self._lessons_chain(inputs={**request_query, "llm_version": llm_version})
+            self._db_controller.write_lesson_content_data(lessons_chain_response, course_uuid)
 
-    def _get_lessons_chain_response(self, request_query):
-        return self._lessons_chain(inputs=request_query)
+            response = json.dumps(lessons_chain_response)
+
+            self._db_controller.update_generation_state(
+                course_uuid=course_uuid,
+                new_generation_state=GenerationState.Generated
+            )
+
+            self._data_controller.store_data(response, DataStorage.TOPICS, course_uuid)
+            logger.info(f"Processed request with query: {request_query}")
+
+        except Exception as e:
+            logger.error(e)
+            self._db_controller.update_generation_state(
+                course_uuid=course_uuid,
+                new_generation_state=GenerationState.Failed
+            )
 
     def get_lessons_by_uuid(self, request_uuid):
-        return self._data_controller.get_data(request_uuid)
+        return self._db_controller.check_course_state(request_uuid)

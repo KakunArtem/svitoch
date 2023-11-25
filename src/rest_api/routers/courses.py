@@ -18,11 +18,12 @@ async def _generate_response(
         background_tasks: BackgroundTasks,
         llm_version: LlmTypes
 ) -> DefaultResponse:
-    logger.info(f"Received request text: `{request.text}`")
     course_uuid = uuid.uuid4()
 
+    logger.info(f"Received request text: `{request.text}, UUID: {course_uuid}`")
+
     inputs = {
-        "request_uuid": course_uuid,
+        "course_uuid": course_uuid,
         "request_query": request.text,
         "llm_version": llm_version,
         "language": request.language

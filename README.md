@@ -14,6 +14,7 @@ The project is organized into different modules and components.
 ## Prerequisites
 - Python 3.11.3
 - poetry[https://python-poetry.org/docs/#installation]
+- postgres[https://www.postgresql.org/download/]
 - Docker[https://docs.docker.com/get-docker/]
 
 

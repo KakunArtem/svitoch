@@ -5,12 +5,16 @@ from langchain.chains.base import Chain
 from langchain.prompts import ChatPromptTemplate
 from langchain.schema.runnable import RunnableParallel
 
-from src.llms import OpenAI4Model
+from src.chains.course_chain import LlmTypes
+from src.llms import OpenAI4Model, OpenAI3Model
 from src.prompts import lessons_template
 
 
 class LessonChain(Chain):
-    llm = OpenAI4Model()
+    llms = {
+        LlmTypes.Gpt_3: OpenAI3Model(),
+        LlmTypes.Gpt_4: OpenAI4Model()
+    }
 
     @property
     def input_keys(self) -> List[str]:
@@ -20,17 +24,24 @@ class LessonChain(Chain):
     def output_keys(self) -> List[str]:
         return ["lessons_content"]
 
+    def _get_llm_version(self, llm_version):
+        llm = self.llms.get(llm_version)
+        if llm is None:
+            raise ValueError(f"Invalid llm_version: {llm_version}")
+        return llm
+
     def _get_lessons(self, lessons):
         return [lesson for lesson in lessons.get("lessons")]
 
     def _get_lessons_dict(self, lessons):
         return {f"key{i + 1}": lesson for i, lesson in enumerate(lessons)}
 
-    def _get_prompts_list(self, topics):
+    def _get_prompts_list(self, topics, llm):
+        llm_version = self._get_llm_version(llm)
         return {
             f"key{i + 1}": ChatPromptTemplate.from_template(
                 lessons_template.replace("lessons", f"key{i + 1}")
-            ) | self.llm for i in range(len(topics))
+            ) | llm_version for i in range(len(topics))
         }
 
     def _call(self,
@@ -39,7 +50,7 @@ class LessonChain(Chain):
               ):
         lessons = self._get_lessons(inputs.get("course_content"))
         topics_dict = self._get_lessons_dict(lessons)
-        prompt_list = self._get_prompts_list(lessons)
+        prompt_list = self._get_prompts_list(lessons, inputs.get("llm_version"))
 
         response = RunnableParallel(prompt_list).invoke({**topics_dict, "language": inputs.get("language")})
 

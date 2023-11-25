@@ -2,7 +2,10 @@ from fastapi import FastAPI, Request, status
 from requests import Timeout
 from starlette.responses import JSONResponse
 
+from src.data_storage import DbClient, Base
 from src.rest_api.routers import courses, lessons
+
+DbClient().create_tables(Base)
 
 app = FastAPI()
 app.include_router(courses.router)

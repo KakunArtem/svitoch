@@ -22,6 +22,12 @@ class Config(BaseSettings):
     OPENAI_4_GENERATION_MODEL_NAME: str
     OPENAI_API_KEY: str
 
+    DB_NAME: str
+    DB_USER: str
+    DB_PASSWORD: str
+    DB_HOST: str
+    DB_PORT: str
+
     PROJECT_ROOT: Path = Path(__file__).absolute().parent.parent
 
     class Config:

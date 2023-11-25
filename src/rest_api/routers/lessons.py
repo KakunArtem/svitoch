@@ -3,6 +3,7 @@ import uuid
 from fastapi import APIRouter, HTTPException
 from starlette.background import BackgroundTasks
 
+from src.chains.course_chain import LlmTypes
 from src.configuration import logger
 from src.rest_api.controllers.lessons_controller import LessonsController
 from src.rest_api.models import DefaultResponse, Course
@@ -15,15 +16,18 @@ router = APIRouter(
 
 async def _generate_response(
         request: Course,
-        background_tasks: BackgroundTasks
+        background_tasks: BackgroundTasks,
+        llm_version: LlmTypes
 ) -> DefaultResponse:
-    logger.info(f"Received request text: `{request.course_content}`")
     course_uuid = uuid.uuid4()
-    print(request.dict())
+
+    logger.info(f"Received request text: `{request.course_content}, UUID: {course_uuid}`")
 
     inputs = {
-        "request_uuid": course_uuid,
-        "request_query": request.dict()
+        "course_uuid": course_uuid,
+        "request_query": request.dict(),
+        "llm_version": llm_version,
+        "language": request.language
     }
 
     background_tasks.add_task(process_lessons_request, inputs)
@@ -38,18 +42,27 @@ def process_lessons_request(inputs):
     lessons_controller = LessonsController()
     lessons_controller.process_request(**inputs)
 
-
 @router.post(
-    "/lessons/generate_lessons", response_model=DefaultResponse, response_model_exclude_none=True
+    "/lessons/base_lessons", response_model=DefaultResponse, response_model_exclude_none=True
 )
 async def response_generate_lessons(
         request: Course,
         background_tasks: BackgroundTasks,
 ):
-    return await _generate_response(request, background_tasks)
+    return await _generate_response(request, background_tasks, LlmTypes.Gpt_3)
 
 
-@router.get("/topics/{course_uuid}")
+@router.post(
+    "/lessons/advance_lessons", response_model=DefaultResponse, response_model_exclude_none=True
+)
+async def response_generate_lessons(
+        request: Course,
+        background_tasks: BackgroundTasks,
+):
+    return await _generate_response(request, background_tasks, LlmTypes.Gpt_4)
+
+
+@router.get("/lessons/{course_uuid}")
 async def get_course_by_uuid(course_uuid: uuid.UUID):
     logger.info(f"Received request for course UUID: {course_uuid}")
 
