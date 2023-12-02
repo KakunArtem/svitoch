@@ -58,4 +58,6 @@ class CourseChain(Chain):
             "course_content": json.loads(response_text.replace("```json", "").replace("```", ""))
         }
 
+        logger.info(f"Course generation for '{query}' is done.")
+
         return result

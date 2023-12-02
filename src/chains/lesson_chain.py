@@ -6,6 +6,7 @@ from langchain.prompts import ChatPromptTemplate
 from langchain.schema.runnable import RunnableParallel
 
 from src.chains.course_chain import LlmTypes
+from src.configuration import logger
 from src.llms import OpenAI4Model, OpenAI3Model
 from src.prompts import lessons_template
 
@@ -53,6 +54,8 @@ class LessonChain(Chain):
         prompt_list = self._get_prompts_list(lessons, inputs.get("llm_version"))
 
         response = RunnableParallel(prompt_list).invoke({**topics_dict, "language": inputs.get("language")})
+
+        logger.info(f"Lessons generation is done.")
 
         return {
             "course_name": inputs.get("course_content").get("course_name"),

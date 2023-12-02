@@ -22,7 +22,7 @@ class DataController:
         file_path = DataController._get_file_path(path, uuid)
         logger.info(f"Writing data to file: {file_path}")
         with open(file_path, "w") as file:
-            file.write(data)
+            file.write(json.dumps(data))
 
     def find_file(self, data_storage: str, target_file: str):
         target_file = f"{target_file}.json"

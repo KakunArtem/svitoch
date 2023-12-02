@@ -25,7 +25,7 @@ class LessonsController(metaclass=SingletonMeta):
         self._db_controller.write_state_data(query, course_uuid, llm_version, language)
 
         try:
-            self._db_controller.write_course_data(request_query, course_uuid)
+            self._db_controller.write_course_records(request_query, course_uuid)
 
             lessons_chain_response = self._lessons_chain(inputs={**request_query, "llm_version": llm_version})
             self._db_controller.write_lesson_content_data(lessons_chain_response, course_uuid)
@@ -37,7 +37,11 @@ class LessonsController(metaclass=SingletonMeta):
                 new_generation_state=GenerationState.Generated
             )
 
-            self._data_controller.store_data(response, DataStorage.TOPICS, course_uuid)
+            self._data_controller.store_data(
+                self._db_controller.get_data_by_course_uuid(course_uuid),
+                DataStorage.TOPICS,
+                course_uuid
+            )
             logger.info(f"Processed request with query: {request_query}")
 
         except Exception as e:

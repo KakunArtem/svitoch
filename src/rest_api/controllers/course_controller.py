@@ -27,7 +27,7 @@ class CourseController(metaclass=SingletonMeta):
         try:
             inputs = {"query": request_query, "llm_version": llm_version, "language": language}
             course_chain_response = self._course_chain(inputs=inputs)
-            self._db_controller.write_course_data(course_chain_response, course_uuid)
+            self._db_controller.write_course_records(course_chain_response, course_uuid)
 
             inputs = {**course_chain_response, "language": language}
             lessons_chain_response = self._lessons_chain(inputs=inputs)
@@ -40,7 +40,11 @@ class CourseController(metaclass=SingletonMeta):
                 new_generation_state=GenerationState.Generated
             )
 
-            self._data_controller.store_data(response, DataStorage.COURSE, course_uuid)
+            self._data_controller.store_data(
+                self._db_controller.get_data_by_course_uuid(course_uuid),
+                DataStorage.COURSE,
+                course_uuid
+            )
             logger.info(f"Processed request with query: {request_query}")
 
         except Exception as e:
