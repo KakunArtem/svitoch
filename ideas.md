@@ -1,6 +1,8 @@
 Coding:
 - elastic usage - Predefined text that we  can use for creating a course (keywords in Elastic can identify text)
 - async request support
+- endpoint with all courses
+- instead of tabs make a pagination bar and[f74f4b96-ac54-4070-891e-5f30fd2e8c54.json](src%2Fdata_storage%2Fdata%2Ftopics%2Ff74f4b96-ac54-4070-891e-5f30fd2e8c54.json) search bar
 
 Business:
 - add separate endpoint for topics - done
