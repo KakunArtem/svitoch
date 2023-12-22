@@ -1,8 +1,8 @@
 import json
 
-from src.chains import LessonChain
+from src.llm_module.chains import CourseChain, LessonChain
 from src.configuration import logger
-from src.data_storage import DataController, DataStorage, DbController, GenerationState
+from src.data_storage_module import DataController, DataStorage, DbController, GenerationState
 
 
 class SingletonMeta(type):
@@ -14,23 +14,26 @@ class SingletonMeta(type):
         return cls._instances[cls]
 
 
-class LessonsController(metaclass=SingletonMeta):
+class CourseController(metaclass=SingletonMeta):
     def __init__(self):
         self._data_controller = DataController()
+        self._course_chain = CourseChain()
         self._lessons_chain = LessonChain()
         self._db_controller = DbController()
 
     def process_request(self, request_query, course_uuid, llm_version, language):
-        query = request_query.get("course_content").get("course_name")
-        self._db_controller.write_state_data(query, course_uuid, llm_version, language)
+        self._db_controller.write_state_data(request_query, course_uuid, llm_version, language)
 
         try:
-            self._db_controller.write_course_records(request_query, course_uuid)
+            inputs = {"query": request_query, "llm_version": llm_version, "language": language}
+            course_chain_response = self._course_chain(inputs=inputs)
+            self._db_controller.write_course_records(course_chain_response, course_uuid)
 
-            lessons_chain_response = self._lessons_chain(inputs={**request_query, "llm_version": llm_version})
+            inputs = {**course_chain_response, "language": language}
+            lessons_chain_response = self._lessons_chain(inputs=inputs)
             self._db_controller.write_lesson_content_data(lessons_chain_response, course_uuid)
 
-            response = json.dumps(lessons_chain_response)
+            response = json.dumps({**course_chain_response, **lessons_chain_response})
 
             self._db_controller.update_generation_state(
                 course_uuid=course_uuid,
@@ -39,7 +42,7 @@ class LessonsController(metaclass=SingletonMeta):
 
             self._data_controller.store_data(
                 self._db_controller.get_data_by_course_uuid(course_uuid),
-                DataStorage.TOPICS,
+                DataStorage.COURSE,
                 course_uuid
             )
             logger.info(f"Processed request with query: {request_query}")
@@ -51,5 +54,8 @@ class LessonsController(metaclass=SingletonMeta):
                 new_generation_state=GenerationState.Failed
             )
 
-    def get_lessons_by_uuid(self, request_uuid):
+    def get_course_by_uuid(self, request_uuid):
         return self._db_controller.check_course_state(request_uuid)
+
+    def get_course_by_name(self, course_name):
+        return self._db_controller.get_data_by_course_name(course_name)

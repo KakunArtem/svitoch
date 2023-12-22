@@ -5,8 +5,8 @@ from langchain.callbacks.manager import CallbackManagerForChainRun
 from langchain.chains.base import Chain
 
 from src.configuration import logger
-from src.llms import OpenAI3Model, OpenAI4Model
-from src.prompts import course_prompt
+from src.llm_module.llms import OpenAI3Model, OpenAI4Model
+from src.llm_module.prompts import course_prompt
 
 
 class LlmTypes:

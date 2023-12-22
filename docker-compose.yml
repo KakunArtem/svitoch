@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+  svitoch_db:
+    image: postgres
+    environment:
+      - POSTGRES_PASSWORD=123
+    volumes:
+      - ${POSTGRES_DATA_PATH}:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+  svitoch-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - DB_NAME=postgres
+      - DB_USER=postgres
+      - DB_PASSWORD=123
+      - DB_HOST=svitoch_db
+      - DB_PORT=5432
+      - OPENAI_3_5_GENERATION_MODEL_NAME=${OPENAI_3_5_GENERATION_MODEL_NAME}
+      - OPENAI_4_GENERATION_MODEL_NAME=${OPENAI_4_GENERATION_MODEL_NAME}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    ports:
+      - "8080:8080"

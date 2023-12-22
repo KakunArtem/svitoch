@@ -3,8 +3,8 @@ from requests import Timeout
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
 
-from src.data_storage import DbClient, Base
-from src.rest_api.routers import courses, lessons
+from src.data_storage_module import DbClient, Base
+from src.rest_api_module.routers import courses, lessons
 
 DbClient().create_tables(Base)
 

@@ -3,10 +3,10 @@ import uuid
 from fastapi import APIRouter, HTTPException
 from starlette.background import BackgroundTasks
 
-from src.chains.course_chain import LlmTypes
+from src.llm_module.chains.course_chain import LlmTypes
 from src.configuration import logger
-from src.rest_api.controllers.lessons_controller import LessonsController
-from src.rest_api.models import DefaultResponse, Course
+from src.rest_api_module.controllers.lessons_controller import LessonsController
+from src.rest_api_module.models import DefaultResponse, Course
 
 router = APIRouter(
     tags=["Lessons"],
@@ -62,7 +62,7 @@ async def response_generate_lessons(
     return await _generate_response(request, background_tasks, LlmTypes.Gpt_4)
 
 
-@router.get("/lessons/{course_uuid}")
+@router.get("/lessons/uuid/{course_uuid}")
 async def get_course_by_uuid(course_uuid: uuid.UUID):
     logger.info(f"Received request for course UUID: {course_uuid}")
 

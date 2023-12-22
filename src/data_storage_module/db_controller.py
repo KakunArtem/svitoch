@@ -1,6 +1,6 @@
 from src.configuration import logger
-from src.data_storage import StateDb, DbClient
-from src.data_storage.db_tables import GenerationState, LessonDb, CourseDb, LessonContentDb
+from src.data_storage_module import StateDb, DbClient
+from src.data_storage_module.db_tables import GenerationState, LessonDb, CourseDb, LessonContentDb
 
 
 class DbController:
@@ -67,7 +67,6 @@ class DbController:
         return [lesson.id for lesson in session.query(LessonDb).filter_by(course_id=course.course_uuid).all()]
 
     def get_data_by_course_uuid(self, course_uuid):
-
         session = self._db_controller.get_session()
 
         state, course = (session.query(StateDb, CourseDb)
@@ -101,6 +100,12 @@ class DbController:
         }
 
         return result
+
+    def get_data_by_course_name(self, course_name):
+        session = self._db_controller.get_session()
+        courses = session.query(CourseDb).filter_by(course_name=course_name).all()
+
+        return [course.to_dict() for course in courses]
 
     def check_course_state(self, course_uuid):
         session = self._db_controller.get_session()

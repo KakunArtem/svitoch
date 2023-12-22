@@ -2,10 +2,10 @@ import uuid
 
 from fastapi import APIRouter, BackgroundTasks, HTTPException
 
-from src.chains.course_chain import LlmTypes
+from src.llm_module.chains.course_chain import LlmTypes
 from src.configuration import logger
-from src.rest_api.controllers import CourseController
-from src.rest_api.models import DefaultResponse, ModelRequest
+from src.rest_api_module.controllers import CourseController
+from src.rest_api_module.models import DefaultResponse, ModelRequest
 
 router = APIRouter(
     tags=["Course"],
@@ -62,12 +62,24 @@ async def generate_response_advance_course(
     return await _generate_response(request, background_tasks, LlmTypes.Gpt_4)
 
 
-@router.get("/courses/{course_uuid}")
+@router.get("/courses/uuid/{course_uuid}")
 async def get_course_by_uuid(course_uuid: uuid.UUID):
     logger.info(f"Received request for course UUID: {course_uuid}")
 
     course_controller = CourseController()
     course_data = course_controller.get_course_by_uuid(course_uuid)
+
+    if course_data is None:
+        raise HTTPException(status_code=404, detail="Course not found")
+
+    return course_data
+
+@router.get("/courses/name/{course_name}")
+async def get_course_by_uuid(course_name: str):
+    logger.info(f"Received request for course Name: {course_name}")
+
+    course_controller = CourseController()
+    course_data = course_controller.get_course_by_name(course_name)
 
     if course_data is None:
         raise HTTPException(status_code=404, detail="Course not found")
