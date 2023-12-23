@@ -1,61 +1,88 @@
-import json
+import uuid
 
-from src.llm_module.chains import CourseChain, LessonChain
+from fastapi import APIRouter, BackgroundTasks, HTTPException
+
+from src.llm_module.chains.course_chain import LlmTypes
 from src.configuration import logger
-from src.data_storage_module import DataController, DataStorage, DbController, GenerationState
+from src.rest_api_module.models import DefaultResponse, ModelRequest
+from src.state_module.state_service import StateService
+
+router = APIRouter(
+    tags=["Course"],
+    prefix="/v1",
+)
 
 
-class SingletonMeta(type):
-    _instances = {}
+async def _generate_response(
+        request: ModelRequest,
+        background_tasks: BackgroundTasks,
+        llm_version: LlmTypes
+) -> DefaultResponse:
+    course_uuid = uuid.uuid4()
 
-    def __call__(cls, *args, **kwargs):
-        if cls not in cls._instances:
-            cls._instances[cls] = super().__call__(*args, **kwargs)
-        return cls._instances[cls]
+    logger.info(f"Received request text: `{request.text}, UUID: {course_uuid}`")
+
+    inputs = {
+        "course_uuid": course_uuid,
+        "request_query": request.text,
+        "llm_version": llm_version,
+        "language": request.language
+    }
+
+    background_tasks.add_task(process_course_request, inputs)
+    return DefaultResponse(
+        response={
+            "course_uuid": course_uuid
+        }
+    )
 
 
-class CourseController(metaclass=SingletonMeta):
-    def __init__(self):
-        self._data_controller = DataController()
-        self._course_chain = CourseChain()
-        self._lessons_chain = LessonChain()
-        self._db_controller = DbController()
+def process_course_request(inputs):
+    state_service = StateService()
+    state_service.process_course_request(**inputs)
 
-    def process_request(self, request_query, course_uuid, llm_version, language):
-        self._db_controller.write_state_data(request_query, course_uuid, llm_version, language)
 
-        try:
-            inputs = {"query": request_query, "llm_version": llm_version, "language": language}
-            course_chain_response = self._course_chain(inputs=inputs)
-            self._db_controller.write_course_records(course_chain_response, course_uuid)
+@router.post(
+    "/courses/base_course", response_model=DefaultResponse, response_model_exclude_none=True
+)
+async def generate_response_base_course(
+        request: ModelRequest,
+        background_tasks: BackgroundTasks,
+):
+    return await _generate_response(request, background_tasks, LlmTypes.Gpt_3)
 
-            inputs = {**course_chain_response, "language": language}
-            lessons_chain_response = self._lessons_chain(inputs=inputs)
-            self._db_controller.write_lesson_content_data(lessons_chain_response, course_uuid)
 
-            response = json.dumps({**course_chain_response, **lessons_chain_response})
+@router.post(
+    "/courses/advance_course", response_model=DefaultResponse, response_model_exclude_none=True
+)
+async def generate_response_advance_course(
+        request: ModelRequest,
+        background_tasks: BackgroundTasks,
+):
+    return await _generate_response(request, background_tasks, LlmTypes.Gpt_4)
 
-            self._db_controller.update_generation_state(
-                course_uuid=course_uuid,
-                new_generation_state=GenerationState.Generated
-            )
 
-            self._data_controller.store_data(
-                self._db_controller.get_data_by_course_uuid(course_uuid),
-                DataStorage.COURSE,
-                course_uuid
-            )
-            logger.info(f"Processed request with query: {request_query}")
+@router.get("/courses/uuid/{course_uuid}")
+async def get_course_by_uuid(course_uuid: uuid.UUID):
+    logger.info(f"Received request for course UUID: {course_uuid}")
 
-        except Exception as e:
-            logger.error(e)
-            self._db_controller.update_generation_state(
-                course_uuid=course_uuid,
-                new_generation_state=GenerationState.Failed
-            )
+    state_service = StateService()
+    course_data = state_service.get_course_by_uuid(course_uuid)
 
-    def get_course_by_uuid(self, request_uuid):
-        return self._db_controller.check_course_state(request_uuid)
+    if course_data is None:
+        raise HTTPException(status_code=404, detail="Course not found")
 
-    def get_course_by_name(self, course_name):
-        return self._db_controller.get_data_by_course_name(course_name)
+    return course_data
+
+
+@router.get("/courses/name/{course_name}")
+async def get_course_by_uuid(course_name: str):
+    logger.info(f"Received request for course Name: {course_name}")
+
+    state_service = StateService()
+    course_data = state_service.get_course_by_name(course_name)
+
+    if course_data is None:
+        raise HTTPException(status_code=404, detail="Course not found")
+
+    return course_data

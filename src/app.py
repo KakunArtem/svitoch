@@ -4,7 +4,7 @@ from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
 
 from src.data_storage_module import DbClient, Base
-from src.rest_api_module.routers import courses, lessons
+from src.rest_api_module.controllers import course_controller, lessons_controller
 
 DbClient().create_tables(Base)
 
@@ -16,8 +16,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"]
 )
-app.include_router(courses.router)
-app.include_router(lessons.router)
+app.include_router(course_controller.router)
+app.include_router(lessons_controller.router)
 
 
 @app.exception_handler(Timeout)

@@ -45,4 +45,4 @@ COPY . ./
 EXPOSE 8080
 
 # run
-CMD poetry run uvicorn src.rest_api_module.app:app --host=0.0.0.0 --port=8080
+CMD poetry run uvicorn src.app:app --host=0.0.0.0 --port=8080
