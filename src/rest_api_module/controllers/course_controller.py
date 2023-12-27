@@ -20,11 +20,11 @@ async def _generate_response(
 ) -> DefaultResponse:
     course_uuid = uuid.uuid4()
 
-    logger.info(f"Received request text: `{request.text}, UUID: {course_uuid}`")
+    logger.info(f"Received request query: `{request.query}, UUID: {course_uuid}`")
 
     inputs = {
         "course_uuid": course_uuid,
-        "request_query": request.text,
+        "request_query": request.query,
         "llm_version": llm_version,
         "language": request.language
     }

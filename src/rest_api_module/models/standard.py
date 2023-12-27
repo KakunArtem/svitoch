@@ -9,6 +9,6 @@ class DefaultResponse(BaseModel):
 
 
 class ModelRequest(BaseModel):
-    text: str = Field(..., min_length=1)
+    query: str = Field(..., min_length=1)
     debug: Optional[bool] = Field(default=False, alias="_debug", exclude=True)
     language: Optional[str] = Field(min_length=1, alias="language", default="English")
