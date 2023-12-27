@@ -45,7 +45,7 @@ def process_lessons_request(inputs):
 @router.post(
     "/lessons/base_lessons", response_model=DefaultResponse, response_model_exclude_none=True
 )
-async def response_generate_lessons(
+async def generate_base_lessons(
         request: Course,
         background_tasks: BackgroundTasks,
 ):
@@ -55,7 +55,7 @@ async def response_generate_lessons(
 @router.post(
     "/lessons/advance_lessons", response_model=DefaultResponse, response_model_exclude_none=True
 )
-async def response_generate_lessons(
+async def generate_advance_lessons(
         request: Course,
         background_tasks: BackgroundTasks,
 ):
@@ -63,7 +63,7 @@ async def response_generate_lessons(
 
 
 @router.get("/lessons/uuid/{course_uuid}")
-async def get_course_by_uuid(course_uuid: uuid.UUID):
+async def get_lessons_by_uuid(course_uuid: uuid.UUID):
     logger.info(f"Received request for course UUID: {course_uuid}")
 
     state_service = StateService()

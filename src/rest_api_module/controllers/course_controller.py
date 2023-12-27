@@ -45,7 +45,7 @@ def process_course_request(inputs):
 @router.post(
     "/courses/base_course", response_model=DefaultResponse, response_model_exclude_none=True
 )
-async def generate_response_base_course(
+async def generate_base_course(
         request: ModelRequest,
         background_tasks: BackgroundTasks,
 ):
@@ -55,7 +55,7 @@ async def generate_response_base_course(
 @router.post(
     "/courses/advance_course", response_model=DefaultResponse, response_model_exclude_none=True
 )
-async def generate_response_advance_course(
+async def generate_advance_course(
         request: ModelRequest,
         background_tasks: BackgroundTasks,
 ):
