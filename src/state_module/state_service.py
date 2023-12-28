@@ -1,6 +1,6 @@
 from src.configuration import logger
 from src.data_storage_module import DataController, DbController, GenerationState, DataStorage
-from src.llm_module.chains import CourseChain, LessonChain
+from src.llm_module.chains import CourseChain, LessonsChain
 
 
 class SingletonMeta(type):
@@ -16,7 +16,7 @@ class StateService(metaclass=SingletonMeta):
     def __init__(self):
         self._data_controller = DataController()
         self._course_chain = CourseChain()
-        self._lessons_chain = LessonChain()
+        self._lessons_chain = LessonsChain()
         self._db_controller = DbController()
 
     def process_course_request(self, request_query, course_uuid, llm_version, language):

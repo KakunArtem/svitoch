@@ -11,7 +11,7 @@ from src.llm_module.llms import OpenAI4Model, OpenAI3Model
 from src.llm_module.prompts import lessons_template
 
 
-class LessonChain(Chain):
+class LessonsChain(Chain):
     llms = {
         LlmTypes.Gpt_3: OpenAI3Model(),
         LlmTypes.Gpt_4: OpenAI4Model()
