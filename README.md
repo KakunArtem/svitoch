@@ -44,7 +44,7 @@ docker run --name svitoch_postgres -e POSTGRES_PASSWORD=123 -v SET_LOCAL_PATH -p
 4. Start local server:
 
 ```bash
-poetry run uvicorn src.rest_api.app:app --host=0.0.0.0 --port=8080 --reload
+poetry run uvicorn src.app:app --host=0.0.0.0 --port=8080 --reload
 ```
 
 5. Swagger UI URL
