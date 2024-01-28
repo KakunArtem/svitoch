@@ -34,7 +34,7 @@ course_prompt = ChatPromptTemplate(
 
 lessons_template = """
 ### Instructions ###
-If MUST ONLY generate a comprehensive guide for each of the provided topics.
+You MUST ONLY generate a comprehensive guide for each of the provided topics.
 You MUST provide detailed code examples with explanations.
 You MUST provide comparison tables.
 You MUST use a detailed explanation.
